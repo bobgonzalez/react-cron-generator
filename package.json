@@ -20,10 +20,6 @@
   },
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "files": [
-    "dist",
-    "README.md"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/sojinantony01/react-cron-generator.git"
