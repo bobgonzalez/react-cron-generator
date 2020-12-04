@@ -11,6 +11,7 @@ export default class MonthlyCron extends Component {
             minute:0
         };
 
+        this.onMonthlyChange = this.onMonthlyChange.bind(this);
         this.onDayChange = this.onDayChange.bind(this);
         this.onLastDayChange = this.onLastDayChange.bind(this);
         this.onAtHourChange = this.onAtHourChange.bind(this);
@@ -27,6 +28,11 @@ export default class MonthlyCron extends Component {
             this.state.every = "4";
         } else {
             this.state.every = "1";
+        }
+    }
+    onMonthlyChange(e) {
+        if(!e.target.value || (e.target.value > 0 && e.target.value < 12 )) {
+            this.onValueChange(4, (e.target.value ? `1/${e.target.value}` : e.target.value));
         }
     }
     onDayChange(e) {
@@ -57,20 +63,31 @@ export default class MonthlyCron extends Component {
         val[1] = `${e.target.value}`;
         this.props.onChange(val)
     }
+    onValueChange(cronPosition, value) {
+        let val = this.state.value;
+        val[cronPosition] = value;
+        this.props.onChange(val);
+    }
     render() {
         const translateFn = this.props.translate;
         this.state.value = this.props.value;
-        let enable_monthly_options = this.props.enable_monthly_options;
+        let enable_monthly_options = this.props.enable_monthly_options,
+            enableEveryNthMonth = this.props.enableEveryNthMonth;
 
-        let monthly_days = <div>
+        let everyNthMonth = enableEveryNthMonth ? <div>
+                <span>{translateFn('Every')}</span>
+                <input disabled={!this.state.every} type="Number" maxLength="2" onChange={this.onMonthlyChange} value={this.state.value[4].split('/')[1] ? this.state.value[4].split('/')[1] :''} />
+                <span>{translateFn('month(s)')}</span>
+            </div> : "";
+        let monthlyDays = <div>
             {translateFn('Day')}
             <input readOnly={this.state.every !== "1"} type="number" value={this.state.value[3]} onChange={this.onDayChange}/>
             {translateFn('of every month(s)')}
         </div>;
-        let monthly_options = enable_monthly_options ? <div>
+        let monthlyOptions = enable_monthly_options ? <div>
             <div className="well well-small">
                 <input type="radio" onChange={(e) => {this.setState({every:e.target.value}); this.props.onChange(['0',this.state.value[1] === '*' ? '0' : this.state.value[1], this.state.value[2] === '*' ? '0': this.state.value[2],'1','1/1', '?','*'])}} value="1" name="MonthlyRadio" checked={this.state.every === "1" ? true : false} />
-                {monthly_days}
+                {monthlyDays}
             </div>
             <div className="well well-small">
                 <input onChange={(e) => {this.setState({every:e.target.value}); this.props.onChange(['0',this.state.value[1] === '*' ? '0' : this.state.value[1], this.state.value[2] === '*' ? '0': this.state.value[2],'L','*', '?','*'])}} type="radio" value="2" name="DailyRadio" checked={this.state.every === "2" ? true : false}/>
@@ -85,10 +102,11 @@ export default class MonthlyCron extends Component {
                 <input readOnly={this.state.every !== "4"} type="number" value={this.state.value[3].split('-')[1]} onChange={this.onLastDayChange}/>
                 {translateFn('day(s) before the end of the month')}
             </div>
-        </div> : monthly_days;
+        </div> : monthlyDays;
 
         return (<div className="tab-pane" >
-                    {monthly_options}
+                    {everyNthMonth}
+                    {monthlyOptions}
                     {translateFn('Start time')} 
                     <Hour onChange={this.onAtHourChange} value={this.state.value[2]} />
                     <Minutes onChange={this.onAtMinuteChange} value={this.state.value[1]} />
