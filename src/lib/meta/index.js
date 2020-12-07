@@ -85,6 +85,22 @@ export const loadMonthlyOptions = (options) => {
 };
 
 /**
+ * Validate and load enableNthMonthOption
+ * @param {*} options
+ */
+export const loadNthMonthOption = (options) => {
+    if(options) {
+        if(options.hasOwnProperty('enableNthMonthOption')) {
+            if(typeof options.enableNthMonthOption !== "boolean") {
+                throw new Error('enableNthMonthOption must be true or false.');
+            }
+            return options.enableNthMonthOption;
+        }
+    }
+    return false;
+};
+
+/**
  * Validate and load enable_daily_options
  * @param {*} options
  */
